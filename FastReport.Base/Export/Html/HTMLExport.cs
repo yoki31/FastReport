@@ -93,6 +93,8 @@ namespace FastReport.Export.Html
 
         private bool layers;
         private bool wysiwyg;
+        private bool notRotateLandscapePage;
+        private bool highQualitySVG;
         private MyRes res;
         private HtmlTemplates templates;
         private string targetPath;
@@ -252,6 +254,15 @@ namespace FastReport.Export.Html
         {
             get { return print; }
             set { print = value; }
+        }
+
+        /// <summary>
+        /// Enable or disable a picture optimization.
+        /// </summary>
+        public bool HighQualitySVG
+        {
+            get { return highQualitySVG; }
+            set { highQualitySVG = value; }
         }
 
         /// <summary>
@@ -415,6 +426,15 @@ namespace FastReport.Export.Html
         {
             get { return enableVectorObjects; }
             set { enableVectorObjects = value; }
+        }
+
+        /// <summary>
+        /// Not rotate landscape page when print.
+        /// </summary>
+        public bool NotRotateLandscapePage
+        {
+            get { return notRotateLandscapePage; }
+            set { notRotateLandscapePage = value; }
         }
 
         #endregion Public properties
@@ -687,6 +707,18 @@ namespace FastReport.Export.Html
                     singlePage = true;
                     subFolder = false;
                     navigator = false;
+                    if(ExportMode == ExportType.WebPrint)
+                    {
+                        NotRotateLandscapePage = true;
+                        for (int i = 0; i < Report.PreparedPages.Count; i++ )
+                        {
+                            if (!Report.PreparedPages.GetPage(i).Landscape)
+                            {
+                                NotRotateLandscapePage = false;
+                                break;
+                            }
+                        }
+                    }
                     if (format == HTMLExportFormat.HTML && !embedPictures)
                         pictures = false;
                 }
@@ -945,8 +977,10 @@ namespace FastReport.Export.Html
             writer.WriteBool("SubFolder", SubFolder);
             writer.WriteBool("Navigator", Navigator);
             writer.WriteBool("SinglePage", SinglePage);
+            writer.WriteBool("NotRotateLandscapePage", NotRotateLandscapePage);
+            writer.WriteBool("HighQualitySVG", HighQualitySVG);
         }
-
+       
         /// <summary>
         /// For internal use only.
         /// </summary>
@@ -972,7 +1006,7 @@ namespace FastReport.Export.Html
         {
             Zoom = 1.0f;
             HasMultipleFiles = true;
-            layers = false;
+            layers = true;
             wysiwyg = true;
             pictures = true;
             webMode = false;
@@ -996,7 +1030,10 @@ namespace FastReport.Export.Html
             exportMode = ExportType.Export;
             res = new MyRes("Export,Html");
             embeddedImages = new Dictionary<string, string>();
+            notRotateLandscapePage = false;
+            highQualitySVG = false;
         }
+        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HTMLExport"/> class for WebPreview mode.

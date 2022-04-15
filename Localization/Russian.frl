@@ -59,6 +59,7 @@
     <TableManualBuildError Text="Вы можете использовать методы TableObject.PrintRow, PrintColumn только в событии ManualBuild."/>
     <Warning Text="Предупреждение"/>
     <WarningSaveRDL Text="Формат RDL имеет некоторые ограничения! Данный фильтр сохранит только внешний вид шаблона! Источники данных и объекты Barcode, Rich Text, CheckBox и ZipCode не будут сохранены! Некоторые из свойств объектов не будут сохранены! Так что вы можете потерять некоторые элементы и свойства шаблона. Все равно сохранить?"/>
+    <WarningMatrixOnRepeatedBand Text="Не рекомендуется помещать {0} на {1}. В этом случае {0} будет создаваться каждый раз при печати бэнда, что приведет к переполнению стека."/>
     <WrongFileFormat Text="Невозможно прочитать файл, неизвестный формат файла."/>
     <WrongListAndLabelFile Text="Невозможно прочитать файл. Файл поврежден или не является отчетом List and Label."/>
     <WrongCrystalReportsFile Text="Невозможно прочитать файл. Файл поврежден или не является отчетом Crystal Reports."/>
@@ -115,6 +116,8 @@
     <MsSqlDataConnection Text="Подключение к MS SQL"/>
     <OdbcDataConnection Text="Подключение к ODBC"/>
     <FirebirdDataConnection Text="Подключение к Firebird "/>
+    <ExcelDataConnection Text="Подключение к Excel"/>
+     <CassandraDataConnection Text="Подключение к Cassandra"/>
     <VistaDBDataConnection Text="Подключение к VistaDB"/>
     <PostgresDataConnection Text="Подключение к Postgres"/>
     <MySqlDataConnection Text="Подключение к MySQL"/>
@@ -124,11 +127,13 @@
     <SharePointDataConnection Text="Подключение к SharePoint"/>
     <GoogleBigQueryDataConnection Text="Подключение к Google Big Query"/>
     <JsonDataConnection Text="База данных JSON"/>
+    <ESDataSourceConnection Text="Подключение к ElasticSearch"/>
     <CouchbaseDataConnection Text="Подключение к Couchbase"/>
     <MongoDBDataConnection Text="Подключение к MongoDB"/>
     <NosDbDataConnection Text="Подключение к NosDb"/>
     <RavenDBDataConnection Text="Подключение к RavenDB"/>
     <SqlAnywhereDataConnection Text="Подключение к SqlAnywhere"/>
+    <ClickHouseDataConnection Text="Подключение к ClickHouse"/>
     <Bands Text="Бэнды">
       <ReportTitle Text="Заголовок отчета"/>
       <ReportSummary Text="Подвал отчета"/>
@@ -301,6 +306,7 @@
     <XsdFile Text="XML схема (*.xsd)|*.xsd"/>
     <XmlFile Text="XML данные (*.xml)|*.xml"/>
     <MdbFile Text="База данных MS Access (*.mdb)|*.mdb"/>
+    <AccdbFile Text="База данных MS Access 2007 (*.accdb)|*.accdb"/>
     <MdfFile Text="База данных Microsoft SQL Server (*.mdf)|*.mdf"/>
     <RtfFile Text="Форматированный текст (*.rtf)|*.rtf"/>
     <Images Text="Файлы картинок|*.bmp;*.png;*.jpg;*.jpeg;*.gif;*.tiff;*.tif;*.ico;*.emf;*.wmf"/>
@@ -409,6 +415,7 @@
         <Close Text="Закрыть"/>
         <Save Text="Сохранить"/>
         <SaveAs Text="Сохранить как..."/>
+        <SaveWithRandomData Text="Сохранить со случайными данными..."/>
         <SaveAll Text="Сохранить все"/>
         <PageSetup Text="Параметры страницы..."/>
         <PrinterSetup Text="Параметры принтера..."/>
@@ -1572,6 +1579,7 @@
       <EditAfterInsert Text="Редактировать объект после вставки"/>
       <EventBandIndicator Text="Отображать индикатор на бэндах с событиями"/>
       <EventObjectIndicator Text="Отображать индикатор на объектах с событиями"/>
+      <EnableBacklightIntersectingObjects Text="Подсвечивать пересекающиеся объекты"/>
       <ObjectsAppearance Text="Внешний вид объектов"/>
 	  <EnableBacklight Text="Подсвечивать активный бэнд"/>
 	  <SimplifyDBFields Text="Упрощенное отображение имен полей БД"/>
@@ -1910,6 +1918,11 @@
       <UseSql Text="Аутентификация MS SQL"/>
       <SavePassword Text="Сохранить пароль"/>
     </MsSql>
+    <Cassandra>
+      <ContactPoints Text="Адреса БД(;):"/>
+      <Port Text="Порт:"/>
+      <Keyspace Text="Пространство ключей:"/>
+    </Cassandra>
     <OleDb>
       <ConnectionString Text="Строка подключения"/>
       <Build Text="Создать..."/>
@@ -1924,6 +1937,10 @@
       <Xsd Text="Файл схемы или URL:"/>
       <Xml Text="Файл данных или URL:"/>
     </Xml>
+    <Access>
+      <Provider Text="Поставщик:"/>
+    </Access>
+    <Xlsx Text="Выберите файл .xlsx:"/>
     <Csv>
       <ConfigureDatabase Text="Настройка базы данных"/>
       <SelectFile Text="Выберите .csv файл (путь или url):"/>
@@ -1971,6 +1988,11 @@
       <Port Text="Порт:"/>
       <UseSsl Text="Использовать SSL"/>
     </MongoDB>
+    <Clickhouse>
+      <Server Text="Сервер"/>
+      <ServerPort Text="Порт:"/>
+      <Database Text="База данных"/>
+    </Clickhouse>
   </ConnectionEditors>
   <ComponentMenu>
     <Component>
@@ -2273,6 +2295,7 @@
       <Default Text="По умолчанию"/>
       <OEM Text="OEM"/>
       <DataOnly Text="Только данные"/>
+      <ExportType Text="Экспортировать типы данных"/>
       <FieldNames Text="Имена полей (например, Field1;Field2):"/>
     </Dbf>
     <Xml Text="Экспорт в XML">
@@ -2300,6 +2323,17 @@
       <MoveAndModify Text="Перемещать и изменять вместе с ячейкой."/>
       <MoveOnly Text="Перемещать, но не изменять размеры."/>
       <Unchangeable Text="Не перемещать и не изменять размеры."/>
+      <ScaleInPercent Text="Установить масштаб в процентах:"/>
+      <PinnedCells Text="Закрепление ячеек"/>
+      <WithoutPinning Text="Без закрепления"/>
+      <FirstColumn Text="Первый столбец"/>
+      <FirstLine Text="Первая строка"/>
+      <OtherPinning Text="Другое закрепление"/>
+      <Columns Text="Столбцы:"/>
+      <Rows Text="Строки:"/>
+      <Basic Text="Основные"/>
+      <Other Text="Другие"/>
+      <ShowGridLines Text="Показать линии сетки"/>
     </Xlsx>
     <Xls Text="Экспорт в Excel 97">
       <File Text="Excel 97 формат"/>
@@ -2418,6 +2452,8 @@
       <Layers Text="Слои"/>
       <EmbPic Text="Встроенные картинки"/>
       <Total Text="Всего"/>
+      <HighQualitySVG Text="Высокое качество SVG"/>
+      <NotRotateLandscapePage Text="Не поворачивать альбомные страницы при печати"/>
       <First Text="&lt;&lt;"/>
       <Last Text="&gt;&gt;"/>
       <Prev Text="&lt;"/>
@@ -2438,6 +2474,7 @@
       <Density Text="Плотность"/>
       <FontScale Text="Масштаб шрифта"/>
       <PrintAsBitmap Text="Печатать как изображение"/>
+      <Version Text="Версия ZPL"/>
     </Zpl>
     <Email Text="Отправка e-mail">
       <Email Text="Письмо"/>

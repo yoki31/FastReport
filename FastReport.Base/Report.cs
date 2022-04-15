@@ -628,7 +628,7 @@ namespace FastReport
                         value[i] = value[i].Replace("System.Windows.Forms.DataVisualization", "FastReport.DataVisualization");
                     }
                 }
-                referencedAssemblies = value; 
+                referencedAssemblies = value;
             }
         }
 
@@ -849,11 +849,11 @@ namespace FastReport
                     "System.Xml.dll",
 
                     "FastReport.Compat.dll",
-#if !NETSTANDARD
+#if !CROSSPLATFORM
                     "System.Windows.Forms.dll",
 #endif
 
-#if NETSTANDARD || NETCOREAPP
+#if CROSSPLATFORM || COREWIN
                     "System.Drawing.Primitives",
 #endif
 
@@ -875,7 +875,7 @@ namespace FastReport
             {
                 if (measureGraphics == null)
                 {
-#if NETSTANDARD2_0 || NETSTANDARD2_1 || MONO
+#if CROSSPLATFORM || MONO
                     measureBitmap = new Bitmap(1, 1);
                     measureGraphics = new GdiGraphics(measureBitmap);
 #else
@@ -886,7 +886,7 @@ namespace FastReport
             }
         }
 
-        internal string GetReportName
+        public string GetReportName
         {
             get
             {
@@ -922,9 +922,9 @@ namespace FastReport
             }
         }
 
-#endregion Properties
+        #endregion Properties
 
-#region Private Methods
+        #region Private Methods
 
         private bool ShouldSerializeReferencedAssemblies()
         {
@@ -1066,9 +1066,9 @@ namespace FastReport
             needCompile = true;
         }
 
-#endregion Private Methods
+        #endregion Private Methods
 
-#region Protected Methods
+        #region Protected Methods
 
         /// <inheritdoc/>
         protected override void Dispose(bool disposing)
@@ -1104,9 +1104,9 @@ namespace FastReport
                 base.DeserializeSubItems(reader);
         }
 
-#endregion Protected Methods
+        #endregion Protected Methods
 
-#region IParent
+        #region IParent
 
         /// <inheritdoc/>
         public bool CanContain(Base child)
@@ -1173,9 +1173,9 @@ namespace FastReport
             // do nothing
         }
 
-#endregion IParent
+        #endregion IParent
 
-#region ISupportInitialize Members
+        #region ISupportInitialize Members
 
         /// <inheritdoc/>
         public void BeginInit()
@@ -1190,9 +1190,9 @@ namespace FastReport
             Dictionary.RegisterData(initializeData, initializeDataName, false);
         }
 
-#endregion ISupportInitialize Members
+        #endregion ISupportInitialize Members
 
-#region Script related
+        #region Script related
 
         private void FillDataSourceCache()
         {
@@ -1348,8 +1348,6 @@ namespace FastReport
 
                 object val = ConvertToColumnDataType(column.Value, column.DataType, false);
 
-                
-
                 if (CustomCalc != null)
                 {
                     CustomCalcEventArgs e = new CustomCalcEventArgs(expr, val, this);
@@ -1378,7 +1376,7 @@ namespace FastReport
             return CalcExpression(expression, value);
         }
 
-        private object ConvertToColumnDataType( object val, Type dataType, bool convertNulls)
+        private object ConvertToColumnDataType(object val, Type dataType, bool convertNulls)
         {
             if (val == null || val is DBNull)
             {
@@ -1418,6 +1416,11 @@ namespace FastReport
         /// </remarks>
         protected virtual object CalcExpression(string expression, Variant value)
         {
+            if (expression.ToLower() == "true" || expression.ToLower() == "false")
+            {
+                expression = expression.ToLower();
+            }
+
             // try to calculate the expression
             foreach (AssemblyDescriptor d in assemblies)
             {
@@ -1630,9 +1633,9 @@ namespace FastReport
             return Dictionary.FindByAlias(alias) as DataSourceBase;
         }
 
-#endregion Script related
+        #endregion Script related
 
-#region Public Methods
+        #region Public Methods
 
         /// <inheritdoc/>
         public override void Assign(Base source)
@@ -1888,6 +1891,28 @@ namespace FastReport
         }
 
         /// <summary>
+        /// Saves the report to a stream with randomized values in data sources.
+        /// </summary>
+        /// <param name="stream">The stream to save to.</param>
+        public void SaveWithRandomData(Stream stream)
+        {
+            FRRandom random = new FRRandom();
+            random.RandomizeDataSources(Dictionary.DataSources);
+            Save(stream);
+        }
+
+        /// <summary>
+        /// Saves the report to a file with randomized values in data sources.
+        /// </summary>
+        /// <param name="fileName">The name of the file to save to.</param>
+        public void SaveWithRandomData(string fileName)
+        {
+            FRRandom random = new FRRandom();
+            random.RandomizeDataSources(Dictionary.DataSources);
+            Save(fileName);
+        }
+
+        /// <summary>
         /// Loads report from a stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
@@ -1945,6 +1970,12 @@ namespace FastReport
                 }
 
                 reader.Read(this);
+
+                foreach (Base c in AllObjects)
+                {
+                    if (c is BandBase)
+                        Validator.ValidateIntersectionAllObjects(c as BandBase);
+                }
             }
         }
 
@@ -2394,13 +2425,18 @@ namespace FastReport
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void PreparePhase1()
         {
+            bool webDialog = false;
             SetRunning(true);
             if (preparedPages != null)
+            {
+                // if prepared pages are set before => it's call method again => it's web dialog
+                webDialog = true;
                 preparedPages.Clear();
+            }
             SetPreparedPages(new Preview.PreparedPages(this));
             engine = new ReportEngine(this);
             Compile();
-            Engine.RunPhase1();
+            Engine.RunPhase1(true, webDialog);
         }
 
         /// <summary>

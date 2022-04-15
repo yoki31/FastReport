@@ -19,6 +19,8 @@ namespace FastReport.Web
 #if DIALOGS
         public bool ShowOnDialogPage { get; set; } = true;
 #endif
+
+
         [Obsolete("Please, use Position")]
         public bool ShowBottomToolbar
         {
@@ -34,6 +36,9 @@ namespace FastReport.Web
             }
         }
 
+        /// <summary>
+        /// ExportMenu settings
+        /// </summary>
         public ExportMenuSettings Exports { get; set; } = ExportMenuSettings.Default;
 
         public bool ShowPrevButton { get; set; } = true;
@@ -147,9 +152,9 @@ namespace FastReport.Web
                 {
                     case Positions.Left:
                     case Positions.Right:
-                        return (Height * 2.5f).ToString("0.##", CultureInfo.InvariantCulture);
+                        return (Height * 11f).ToString("0.##", CultureInfo.InvariantCulture);
                     default:
-                        return Height.ToString("0.##", CultureInfo.InvariantCulture);
+                        return Height.ToString();
                 }
             }
         }
